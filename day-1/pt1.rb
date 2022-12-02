@@ -1,5 +1,5 @@
 require "byebug"
-require_relative "elf"
+require_relative "../helpers/elf"
 fname = "input.txt"
 content = File.read(fname)
 
