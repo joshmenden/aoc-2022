@@ -13,61 +13,72 @@ class Match
         A: :rock,
         B: :paper,
         C: :scissors,
-        X: :rock,
-        Y: :paper,
-        Z: :scissors,
+        X: :lose,
+        Y: :draw,
+        Z: :win,
     }
 
     SCORES = {
-        A: 0, # rock
-        B: 1, # paper
-        C: 2, # scissors
-        X: 0, # rock
-        Y: 1, # paper
-        Z: 2, # scissors
+        :rock => 0,
+        :paper => 1,
+        :scissors => 2,
+        :lose => 0,
+        :draw => 3,
+        :win => 6
     }
 
-    def initialize(opp, my)
-        @opp = opp.to_sym
-        @my = my.to_sym
+    def initialize(opp:, my: nil, result:)
+        @opp = CONVERSION[opp.to_sym]
+        @result = CONVERSION[result.to_sym]
+        @my = needed_throw
     end
 
     def score
         score = (SCORES[@my] + 1)
-        score += 3 if draw?
-        score += 6 if win?
+        score += SCORES[@result]
 
         score
     end
 
-    def win?
-        opp_conv = CONVERSION[@opp]
-        case CONVERSION[@my]
-        when :rock
-            return opp_conv == :scissors
-        when :paper
-            return opp_conv == :rock
-        when :scissors
-            return opp_conv == :paper
+    def needed_throw
+        case @result
+        when :lose
+            return losing_throw(@opp)
+        when :draw
+            return @opp
+        when :win
+            return winning_throw(@opp)
         end
     end
 
-    def draw?
-        SCORES[@my] == SCORES[@opp]
+    def winning_throw(against)
+        case against
+        when :rock
+            return :paper
+        when :paper
+            return :scissors
+        when :scissors
+            return :rock
+        end
     end
 
-    def result
-        return "win" if win?
-        return "draw" if draw?
-        return "loss" if !win? && !draw?
+    def losing_throw(against)
+        case against
+        when :rock
+            return :scissors
+        when :paper
+            return :rock
+        when :scissors
+            return :paper
+        end
     end
+
 end
 
 matches = []
 content.split("\n").each do |line|
     choices = line.split(" ")
-    matches << Match.new(choices[0], choices[1])
+    matches << Match.new(opp: choices[0], result: choices[1])
 end
 
 puts matches.map(&:score).inject(0, :+)
-# puts matches.map(&:result)
