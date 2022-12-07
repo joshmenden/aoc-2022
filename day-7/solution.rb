@@ -4,8 +4,6 @@ require "byebug"
 require "active_support/all"
 content = File.read("input.txt")
 
-# 1097622 is wrong
-
 DIR_SIZES = {}
 
 class Dir
@@ -26,7 +24,6 @@ class Dir
     end
 
     def calculate_size(dir, curr_size)
-        # byebug
         dir.children.values.each do |ch|
             curr_size += ch.size
         end
@@ -67,5 +64,16 @@ content.split("\n").each_with_index do |cmd, index|
     end
 end
 
-puts root.size
-puts DIR_SIZES.values.reject {|num| num >= 100000 }.inject(0, :+)
+# pt1
+# root.size
+# puts DIR_SIZES.values.reject {|num| num >= 100000 }.inject(0, :+)
+
+TOTAL_SPACE = 70000000
+REQUIRED = 30000000
+used = root.size
+
+available = TOTAL_SPACE - used
+need_to_free = REQUIRED - available
+
+vals = DIR_SIZES.values.reject {|v| v < need_to_free }.sort
+puts vals.first
