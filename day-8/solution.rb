@@ -11,62 +11,57 @@ rows.map! {|r| r.split("").map(&:to_i) }
 class Solver
     def initialize(grid)
       @grid = grid
-      @visible = 0
+      @tree_score = 0
     end
 
-    def count_visible
+    def highest_tree_score
         @grid.each_with_index do |row, r_index|
             row.each_with_index do |column, c_index|
-                @visible += 1 if is_visible?(r_index, c_index)
+                ts = tree_score?(r_index, c_index)
+                @tree_score = ts unless @tree_score > ts
             end
         end
 
-        return @visible
+        return @tree_score
     end
 
-    def is_visible?(row, column)
-        return true if row == 0
-        return true if row == @grid.count - 1
-        return true if column == 0
-        return true if column == @grid[0].count - 1
-
+    def tree_score?(row, column)
         t_val = @grid[row][column]
 
-        return true if taller_than_left_neighbors?(t_val, row, column - 1) || taller_than_right_neighbors?(t_val, row, column + 1) || taller_than_bottom_neighbors?(t_val, row + 1, column) || taller_than_top_neighbors?(t_val, row - 1, column)
-
+        return left_distance(t_val, row, column) * right_distance(t_val, row, column) * top_distance(t_val, row, column) * bottom_distance(t_val, row, column)
     end
 
-    def taller_than_left_neighbors?(val, row, column)
-        return true if column == 0 && val > @grid[row][column]
-        return false if val <= @grid[row][column]
+    def left_distance(val, row, column)
+        return 0 if column == 0
+        return 1 if val <= @grid[row][column - 1]
 
-        return true && taller_than_left_neighbors?(val, row, column - 1)
+        return 1 + left_distance(val, row, column - 1)
     end
 
-    def taller_than_right_neighbors?(val, row, column)
-        return true if column == (@grid[0].count - 1) && val > @grid[row][column]
-        return false if val <= @grid[row][column]
+    def right_distance(val, row, column)
+        return 0 if column == @grid[0].count - 1
+        return 1 if val <= @grid[row][column + 1]
 
-        return true && taller_than_right_neighbors?(val, row, column + 1)
+        return 1 + right_distance(val, row, column + 1)
     end
 
-    def taller_than_bottom_neighbors?(val, row, column)
-        return true if row == (@grid.count - 1) && val > @grid[row][column]
-        return false if val <= @grid[row][column]
+    def bottom_distance(val, row, column)
+        return 0 if row == @grid.count - 1
+        return 1 if val <= @grid[row + 1][column]
 
-        return true && taller_than_bottom_neighbors?(val, row + 1, column)
+        return 1 + bottom_distance(val, row + 1, column)
     end
 
-    def taller_than_top_neighbors?(val, row, column)
-        return true if row == 0 && val > @grid[row][column]
-        return false if val <= @grid[row][column]
+    def top_distance(val, row, column)
+        return 0 if row == 0
+        return 1 if val <= @grid[row - 1][column]
 
-        return true && taller_than_top_neighbors?(val, row - 1, column)
+        return 1 + top_distance(val, row - 1, column)
     end
 end
 
 # byebug
 sv = Solver.new(rows)
 
-puts sv.count_visible
+puts sv.highest_tree_score
 puts "Get coding!"
