@@ -2,13 +2,11 @@
 
 require "byebug"
 require "active_support/all"
-# content = File.read("i.txt")
 content = File.read("input.txt")
 
 class Rope
-    attr_accessor :head, :tail, :visited, :knots
+    attr_accessor :visited, :knots
     def initialize
-        # @head = [0, 0]
         @knots = [
             [0, 0],
             [0, 0],
@@ -24,12 +22,6 @@ class Rope
 
         @visited = [[0, 0]]
     end
-
-    # def printit
-    #     puts "step!"
-    # end
-
-    
 
     def move_right!(dist = 1)
         @knots[0] = [@knots[0][0] + dist, @knots[0][1]]
@@ -75,8 +67,6 @@ class Rope
         elsif @knots[ind1][1] == @knots[ind2][1]
             @knots[ind2] = [(@knots[ind1][0] + @knots[ind2][0]) / 2, @knots[ind2][1]]
         elsif is_diagonal?(@knots[ind1], @knots[ind2])
-            # byebug
-            # this below doesn't work because we have a condition where knots cound be [0, 0] and [2, 2] and need to end up in [1, 1]
             if (@knots[ind1][0] - @knots[ind2][0]).abs > 1 && (@knots[ind1][1] - @knots[ind2][1]).abs > 1
                 @knots[ind2] = [(@knots[ind1][0] + @knots[ind2][0]) / 2, (@knots[ind1][1] + @knots[ind2][1]) / 2]
             elsif (@knots[ind1][0] - @knots[ind2][0]).abs > 1
@@ -115,16 +105,9 @@ content.split("\n").each do |l|
         elsif dir == "D"
             rope.move_down!
         end
-
-        # byebug
-        # if diagnoal in middle of rope it stays diagonasdf
     end
-
-    # byebug
 end
 
 puts rope.visited.count
-
-
 
 puts "Get coding!"
