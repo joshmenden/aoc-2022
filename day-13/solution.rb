@@ -3,8 +3,6 @@
 require "byebug"
 require "active_support/all"
 
-valid_pairs = []
-
 def compare_packets(p1, p2)
     v1 = p1.shift
     v2 = p2.shift
@@ -37,16 +35,16 @@ def compare_packets(p1, p2)
     return true if first_comp == true
 end
 
-# File.read("i.txt").split("\n\n").each_with_index do |pair, index|
-File.read("input.txt").split("\n\n").each_with_index do |pair, index|
-    p1, p2 = pair.split("\n").map {|c| JSON.parse(c) }
-    if compare_packets(p1, p2)
-        valid_pairs << index + 1
-    end
-end
+packets = []
 
-# byebug
-puts valid_pairs.reduce(:+)
+File.read("input.txt").split("\n\n").each_with_index {|pair, index| packets += pair.split("\n").map {|c| JSON.parse(c) } }
 
+div1 = [[2]]
+div2 = [[6]]
+packets << div1
+packets << div2
 
+sorted = packets.sort {|a, b| compare_packets(JSON.parse(a.to_json), JSON.parse(b.to_json)) ? -1 : 1 }
+
+puts (sorted.index(div1) + 1) * (sorted.index(div2) + 1)
 puts "Get coding!"
